@@ -1,6 +1,6 @@
 # CampusFlow Local MVP / V1.3 Pilot Delivery Demo
 
-CampusFlow uses this computer as the backend. It serves a local JSON API, a static frontend, and a persistent SQLite database. The V1.3 pilot delivery package is under `deliverables/v1.3/`, with the V1.2 readiness package, V1.1 review package, and V1.0 submission package preserved.
+CampusFlow uses this computer as the backend. It serves a local JSON API, a static frontend, and a persistent SQLite database. This folder is the clean source snapshot bundled with the V1.3 负责人提交包; the product, pilot, and delivery documents live alongside it in the submission package (`00_提交包阅读说明.md` … `09_提交前检查清单.md`), not inside this source tree.
 
 ## Run
 
@@ -160,31 +160,7 @@ acceptance.status = go
 
 The local MVP uses seeded campus data tables and V1.3 independent simulated pilot delivery data. Development does not import customer real names, student IDs, employee IDs, phone numbers, emails, identity numbers, addresses, personal trajectory data, grades, disciplinary data, or psychological records. Medium and high risk actions require manual review.
 
-## V1.3 Pilot Delivery Package
+## Version Documents
 
-- `deliverables/v1.3/00_V1.3试点交付版总览.md`
-- `deliverables/v1.3/01_试点配置中心说明.md`
-- `deliverables/v1.3/02_模拟导入校验与报告导出说明.md`
-- `deliverables/v1.3/03_V1.3验收清单.md`
+The V1.1 review, V1.2 readiness, and V1.3 delivery write-ups are not bundled inside this source snapshot. See the submission package documents next to this folder — in particular `08_V1.3试点交付说明.md` for the V1.3 delivery scope and `06_试点实施与验收方案.md` for the pilot acceptance plan.
 
-## V1.0 Submission Package
-
-- `deliverables/v1.0/00_V1.0提交包总览.md`
-- `deliverables/v1.0/01_演示手册.md`
-- `deliverables/v1.0/02_试点执行与验收包.md`
-- `deliverables/v1.0/03_工程验收与运维包.md`
-- `deliverables/v1.0/04_提交前检查清单.md`
-
-## V1.1 Review Package
-
-- `deliverables/v1.1/00_V1.1评审版总览.md`
-- `deliverables/v1.1/01_试点仿真数据说明.md`
-- `deliverables/v1.1/02_指标看板与自动验收摘要.md`
-- `deliverables/v1.1/03_V1.1提交前验收清单.md`
-
-## V1.2 Pilot Readiness Package
-
-- `deliverables/v1.2/00_V1.2试点准备版总览.md`
-- `deliverables/v1.2/01_模拟数据与隐私边界说明.md`
-- `deliverables/v1.2/02_数据质量检查与试点配置说明.md`
-- `deliverables/v1.2/03_V1.2验收清单.md`

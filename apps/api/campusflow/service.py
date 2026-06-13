@@ -160,16 +160,33 @@ def list_applications(conn, user_context):
         rows = conn.execute("select * from applications where applicant_id = ? order by created_at desc", (user["user_id"],)).fetchall()
     else:
         rows = conn.execute("select * from applications order by created_at desc").fetchall()
-    return [application_from_row(row) for row in rows]
+    spaces = space_lookup(conn)
+    return [application_from_row(row, spaces) for row in rows]
 
 
-def application_from_row(row):
+def space_lookup(conn):
+    rows = conn.execute("select space_id, name, type_name, capacity, location_tag from spaces").fetchall()
+    return {
+        row["space_id"]: {
+            "space_id": row["space_id"],
+            "space_name": row["name"],
+            "type_name": row["type_name"],
+            "capacity": row["capacity"],
+            "location_tag": row["location_tag"],
+        }
+        for row in rows
+    }
+
+
+def application_from_row(row, spaces=None):
     item = dict(row)
     item["equipment"] = loads(item["equipment"], [])
     item["external_guests"] = bool(item["external_guests"])
     item["risk_items"] = loads(item["risk_items"], [])
     item["approvers"] = loads(item["approvers"], [])
     item["selected_space_id"] = item.pop("selected_space_id")
+    if spaces is not None:
+        item["selected_space"] = spaces.get(item["selected_space_id"])
     return item
 
 
@@ -214,6 +231,20 @@ def record_feedback(conn, user_context, payload):
     conn.commit()
     write_audit(conn, user, "record_feedback", dumps(payload), feedback_id, ["feedback_log"])
     return {"feedback_id": feedback_id, "status": "recorded"}
+
+
+def cancel_feedback(conn, user_context, payload):
+    user = normalize_user(user_context)
+    feedback_id = payload.get("feedback_id")
+    if not feedback_id:
+        raise ValueError("缺少 feedback_id")
+    row = conn.execute("select feedback_id from feedback_log where feedback_id = ?", (feedback_id,)).fetchone()
+    if not row:
+        raise KeyError(feedback_id)
+    conn.execute("delete from feedback_log where feedback_id = ?", (feedback_id,))
+    conn.commit()
+    write_audit(conn, user, "cancel_feedback", dumps(payload), feedback_id, ["feedback_log"])
+    return {"feedback_id": feedback_id, "status": "cancelled"}
 
 
 def summarize_operations(conn, user_context):

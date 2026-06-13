@@ -28,6 +28,24 @@
   function risk(level) {
     return { low: '低风险', medium: '中风险', high: '高风险' }[level] || level;
   }
+  function statusLabel(status) {
+    return {
+      pending_review: '待审批',
+      approved: '已通过',
+      returned_for_materials: '已退回补材料',
+      reschedule_required: '已要求改期',
+      rejected: '已驳回'
+    }[status] || status;
+  }
+  function locationLabel(tag) {
+    return {
+      east_gate: '东门附近',
+      activity_center: '活动中心',
+      library: '图书馆区',
+      east_campus: '东校区',
+      central: '东区中部'
+    }[tag] || tag;
+  }
   function post(path, body) {
     return fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(read);
   }
@@ -162,13 +180,12 @@
   }
 
   function cardSpace(space, index) {
-    const scoreClass = space.score >= 86 ? 'good' : space.score >= 78 ? 'warn' : '';
     return '<article class="space-card">' +
-      '<div class="card-top"><span>TOP ' + (index + 1) + '</span><strong>' + esc(space.score) + '</strong></div>' +
+      '<div class="card-top"><span>TOP ' + (index + 1) + '</span><strong>' + esc(space.score) + '<small>分</small></strong></div>' +
       '<h3>' + esc(space.space_name) + '</h3>' +
       '<p>' + esc(space.type_name) + ' · ' + esc(space.capacity) + ' 人 · ' + esc(eq(space.equipment)) + '</p>' +
       '<ul>' + space.reasons.map((item) => '<li>' + esc(item) + '</li>').join('') + '</ul>' +
-      '<div class="card-actions"><span class="pill ' + scoreClass + '">' + esc(space.score) + ' 分</span>' +
+      '<div class="card-actions">' +
       '<button type="button" class="primary small" data-action="reserved" data-space="' + esc(space.space_id) + '">采纳</button>' +
       '<button type="button" class="ghost small" data-action="feedback" data-space="' + esc(space.space_id) + '">反馈</button></div>' +
       '</article>';
@@ -207,11 +224,23 @@
 
   function queueItem(item) {
     const pending = item.status === 'pending_review';
+    const space = item.selected_space;
+    const venue = space
+      ? esc(space.space_name) + ' · ' + esc(space.type_name) + ' · 可容纳 ' + esc(space.capacity) + ' 人 · ' + esc(locationLabel(space.location_tag))
+      : '暂无匹配场地（需人工指定）';
+    const guests = item.external_guests ? esc(item.external_guest_count) + ' 名外校嘉宾' : '无外校嘉宾';
+    const riskRows = (item.risk_items || []).map((r) =>
+      '<li><span class="pill ' + (r.level === 'low' ? 'good' : 'warn') + '">' + esc(risk(r.level)) + '</span><div><strong>' + esc(r.item) + '</strong><span>' + esc(r.action) + '</span></div></li>'
+    ).join('');
+    const riskCount = (item.risk_items || []).length;
     return '<article class="queue-item">' +
-      '<div><p class="eyebrow">' + esc(item.application_id) + '</p><h3>' + esc(item.event_name) + '</h3>' +
+      '<div class="queue-main"><p class="eyebrow">' + esc(item.application_id) + '</p><h3>' + esc(item.event_name) + '</h3>' +
       '<p>' + esc(item.date_key) + ' ' + esc(item.start_time) + '-' + esc(item.end_time) + ' · ' + esc(item.capacity) + ' 人 · ' + esc(eq(item.equipment)) + '</p>' +
-      '<p>风险：' + esc(risk(item.risk_level)) + ' · 审批：' + esc(item.approvers.join('、')) + '</p></div>' +
-      '<div class="decision-actions"><span class="pill ' + (pending ? 'warn' : 'good') + '">' + esc(item.status) + '</span>' +
+      '<p class="queue-venue"><span>申请场地</span>' + venue + '</p>' +
+      '<p>' + guests + ' · 风险：' + esc(risk(item.risk_level)) + ' · 审批人：' + esc(item.approvers.join('、')) + '</p>' +
+      (riskRows ? '<details class="queue-detail"><summary>风险与材料明细（' + riskCount + '）</summary><ul class="risk-detail-list">' + riskRows + '</ul></details>' : '') +
+      '</div>' +
+      '<div class="decision-actions"><span class="pill ' + (pending ? 'warn' : 'good') + '">' + esc(statusLabel(item.status)) + '</span>' +
       '<button type="button" class="primary small" data-decision="approved" data-application="' + esc(item.application_id) + '"' + (pending ? '' : ' disabled') + '>通过</button>' +
       '<button type="button" class="ghost small" data-decision="returned" data-application="' + esc(item.application_id) + '"' + (pending ? '' : ' disabled') + '>补材料</button>' +
       '<button type="button" class="ghost small" data-decision="rescheduled" data-application="' + esc(item.application_id) + '"' + (pending ? '' : ' disabled') + '>改期</button></div>' +
@@ -229,14 +258,28 @@
     const conflicts = data.conflicts.map((item) =>
       '<article class="conflict-card"><strong>' + esc(item.count) + '</strong><div><h3>' + esc(item.space_name) + '</h3><p>' + esc(item.reason) + '</p></div></article>'
     ).join('');
+    const ready = delivery.delivery_status === 'ready_to_submit';
     els.result.innerHTML =
-      heading('管理员视图', 'V1.3 试点交付看板', delivery.delivery_status === 'ready_to_submit' ? '可提交' : '需补齐', delivery.delivery_status === 'ready_to_submit' ? 'good' : 'warn') +
+      heading('管理员视图', '运营复盘与试点治理', ready ? '交付可提交' : '需补齐', ready ? 'good' : 'warn') +
+      '<section class="role-orient"><h3>管理员在 CampusFlow 的职责</h3>' +
+      '<p>管理员从全校视角复盘空间运营：发现高峰冲突、给出下周调度建议，并监督试点的数据治理与验收。' +
+      '看到的是<strong>聚合统计</strong>，不接入任何个人轨迹；AI 负责生成建议，最终决策仍由管理员人工确认。</p>' +
+      '<div class="role-orient-grid">' +
+      '<div><span>日常运营</span><p>冲突复盘、利用率、周报建议</p></div>' +
+      '<div><span>试点治理</span><p>导入校验、隐私边界、验收门槛</p></div>' +
+      '<div><span>边界</span><p>聚合数据 · 无个人轨迹 · 人工兜底</p></div>' +
+      '</div></section>' +
+      '<section class="ops-hero"><p>' + esc(data.weekly_brief) + '</p><ul>' + actions + '</ul></section>' +
+      '<section class="conflict-cards">' + conflicts + '</section>' +
+      sectionBanner('试点交付材料', '以下为评审与答辩用的试点治理证据，按 V1.3 → V1.1 版本归档。') +
       renderPilotDelivery(delivery) +
       renderPilotReadiness(readiness) +
       renderPilotSummary(pilot) +
-      '<section class="ops-hero"><p>' + esc(data.weekly_brief) + '</p><ul>' + actions + '</ul></section>' +
-      '<section class="conflict-cards">' + conflicts + '</section>' +
       governance('运营数据源');
+  }
+
+  function sectionBanner(title, note) {
+    return '<div class="section-banner"><h3>' + esc(title) + '</h3><p>' + esc(note) + '</p></div>';
   }
 
   function renderPilotDelivery(delivery) {
@@ -366,9 +409,18 @@
     }
     if (target.dataset.action) {
       const action = target.dataset.action;
-      await post('/api/feedback', { role: state.role, space_id: target.dataset.space, action, rating: action === 'reserved' ? 5 : 4 });
-      target.textContent = action === 'reserved' ? '已采纳' : '已反馈';
-      target.disabled = true;
+      if (target.dataset.feedbackId) {
+        // already recorded → undo it
+        await post('/api/feedback/cancel', { role: state.role, feedback_id: target.dataset.feedbackId });
+        delete target.dataset.feedbackId;
+        target.textContent = action === 'reserved' ? '采纳' : '反馈';
+        target.classList.remove('is-done');
+      } else {
+        const result = await post('/api/feedback', { role: state.role, space_id: target.dataset.space, action, rating: action === 'reserved' ? 5 : 4 });
+        target.dataset.feedbackId = result.feedback_id;
+        target.textContent = action === 'reserved' ? '已采纳 · 撤回' : '已反馈 · 撤回';
+        target.classList.add('is-done');
+      }
       await refreshSide();
       return;
     }
@@ -383,9 +435,17 @@
       return;
     }
     if (target.dataset.feedbackAction) {
-      await post('/api/feedback', { role: state.role, application_id: target.dataset.application, action: target.dataset.feedbackAction, rating: 5 });
-      target.textContent = '已记录';
-      target.disabled = true;
+      if (target.dataset.feedbackId) {
+        await post('/api/feedback/cancel', { role: state.role, feedback_id: target.dataset.feedbackId });
+        delete target.dataset.feedbackId;
+        target.textContent = '记录采纳';
+        target.classList.remove('is-done');
+      } else {
+        const result = await post('/api/feedback', { role: state.role, application_id: target.dataset.application, action: target.dataset.feedbackAction, rating: 5 });
+        target.dataset.feedbackId = result.feedback_id;
+        target.textContent = '已记录 · 撤回';
+        target.classList.add('is-done');
+      }
       await refreshSide();
     }
   }

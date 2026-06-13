@@ -62,7 +62,7 @@ class ServerIntegrationTest(unittest.TestCase):
         self.assertIn("/api/pilot/delivery", js)
         self.assertIn("resetDemo", js)
         self.assertIn("text/css", css_type)
-        self.assertIn("--fr-blue", css)
+        self.assertIn("--accent", css)
 
     def test_main_api_chain_supports_local_mvp(self):
         health = self.get_json("/api/health")

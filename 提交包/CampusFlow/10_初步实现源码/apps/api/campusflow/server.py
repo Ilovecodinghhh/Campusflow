@@ -8,6 +8,7 @@ from urllib.parse import parse_qs, urlparse
 from campusflow.db import connect, initialize_database, reset_demo_data
 from campusflow.engine import build_workflow_steps, parse_intent
 from campusflow.service import (
+    cancel_feedback,
     decide_review,
     draft_application,
     list_applications,
@@ -66,8 +67,8 @@ class CampusFlowHandler(BaseHTTPRequestHandler):
         if not parsed.path.startswith("/api/"):
             self.write_json(404, {"error": "NOT_FOUND"})
             return
-        payload = self.read_json()
         try:
+            payload = self.read_json()
             status, body = self.handle_api_post(parsed.path, payload)
         except PermissionError as exc:
             status, body = response(403, {"error": "PERMISSION_DENIED", "message": str(exc)})
@@ -115,6 +116,8 @@ class CampusFlowHandler(BaseHTTPRequestHandler):
                 return response(200, submit_application(conn, user, input_text))
             if path == "/api/feedback":
                 return response(200, record_feedback(conn, user, payload))
+            if path == "/api/feedback/cancel":
+                return response(200, cancel_feedback(conn, user, payload))
             if path == "/api/demo/reset":
                 if user["role"] != "admin":
                     raise PermissionError("只有管理员可以重置演示数据")
