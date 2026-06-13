@@ -1,0 +1,19 @@
+# Python cache and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local runtime state
+*.log
+*.sqlite3
+*.db
+
+# Dependency and build output
+node_modules/
+dist/
+build/
+.venv/
+venv/
+
+# Local-only materials
+个人备答资料_勿提交/

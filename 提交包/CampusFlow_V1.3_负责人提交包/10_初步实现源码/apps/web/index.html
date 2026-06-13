@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusFlow V1.3 试点交付版</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">CF</div>
+          <div>
+            <h1>CampusFlow V1.3 试点交付版</h1>
+            <p>试点配置中心 · 模拟导入校验 · 自动报告导出</p>
+          </div>
+        </div>
+        <div class="server-state">
+          <span id="serverStatus">连接中</span>
+          <strong id="activeRole">学生</strong>
+        </div>
+      </header>
+
+      <section class="presentation-strip">
+        <div>
+          <span class="eyebrow">试点演示</span>
+          <strong id="presentationTitle">3 分钟演示</strong>
+          <p id="presentationPoint">按主链路展示角色切换、试点配置、导入校验和报告导出。</p>
+        </div>
+        <div class="presentation-actions">
+          <button class="ghost" id="mode3" type="button">3 分钟</button>
+          <button class="ghost" id="mode10" type="button">10 分钟</button>
+          <button class="primary small" id="nextStep" type="button">下一步</button>
+          <button class="ghost" id="focusMode" type="button">演示视图</button>
+          <button class="ghost danger" id="resetDemo" type="button">重置演示</button>
+        </div>
+        <div class="step-track" id="stepTrack"></div>
+      </section>
+
+      <section class="workspace">
+        <aside class="pane left-pane">
+          <div class="pane-inner">
+            <div class="section-title">
+              <h2>角色工作台</h2>
+              <span>RBAC</span>
+            </div>
+            <nav class="role-tabs" id="roleTabs"></nav>
+            <div class="prompt-list" id="promptList"></div>
+            <label class="field">
+              <span>当前指令</span>
+              <textarea id="queryInput"></textarea>
+            </label>
+            <div class="button-row">
+              <button class="primary" id="runButton" type="button">执行</button>
+              <button class="ghost" id="submitButton" type="button">提交申请</button>
+            </div>
+
+            <section class="workflow-card">
+              <div class="section-title compact">
+                <h3>AI 工作流</h3>
+                <span>可追踪</span>
+              </div>
+              <ol id="workflowSteps"></ol>
+            </section>
+
+            <details>
+              <summary>结构化输出</summary>
+              <pre id="parsedOutput"></pre>
+            </details>
+          </div>
+        </aside>
+
+        <section class="pane result-pane">
+          <div class="pane-inner">
+            <div id="resultPanel"></div>
+          </div>
+        </section>
+
+        <aside class="pane right-pane">
+          <div class="pane-inner">
+            <div class="section-title">
+              <h2>指标与审计</h2>
+              <span>V1.3</span>
+            </div>
+            <div class="metrics-grid" id="metricsGrid"></div>
+            <section class="dashboard-section delivery-side">
+              <h3>V1.3 试点交付</h3>
+              <p id="deliveryBrief"></p>
+            </section>
+            <section class="dashboard-section readiness-side">
+              <h3>V1.2 试点准备</h3>
+              <p id="readinessBrief"></p>
+            </section>
+            <section class="dashboard-section acceptance-side">
+              <h3>试点验收摘要</h3>
+              <p id="acceptanceBrief"></p>
+            </section>
+            <section class="dashboard-section">
+              <h3>冲突空间 TOP5</h3>
+              <ul id="conflictList" class="conflict-list"></ul>
+            </section>
+            <section class="dashboard-section brief-box">
+              <h3>周报摘要</h3>
+              <p id="weeklyBrief"></p>
+            </section>
+            <section class="dashboard-section">
+              <h3>审计日志</h3>
+              <ul id="auditList" class="audit-list"></ul>
+            </section>
+          </div>
+        </aside>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

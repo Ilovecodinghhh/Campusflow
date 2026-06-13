@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusFlow 智校空间调度助手 Demo</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">CF</div>
+          <div>
+            <h1>CampusFlow 智校空间调度助手</h1>
+            <p>高校空间预约、审批预审与运营分析 Demo</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="data-meta">
+            <strong>试点范围：东区教学楼、图书馆研讨室、学生活动中心</strong>
+            <span>Mock 数据更新时间：2026-05-31 18:00</span>
+          </div>
+          <nav class="segmented" id="roleTabs" aria-label="角色切换"></nav>
+        </div>
+      </header>
+
+      <section class="presentation-strip" aria-label="答辩演示模式">
+        <div class="presentation-copy">
+          <span class="eyebrow">答辩演示</span>
+          <strong id="presentationTitle"></strong>
+          <p id="presentationPoint"></p>
+        </div>
+        <div class="presentation-controls">
+          <div class="segmented presentation-segmented" id="presentationModes" aria-label="演示时长"></div>
+          <button class="ghost-button" id="prevStep" type="button">上一步</button>
+          <button class="primary-button small" id="nextStep" type="button">下一步</button>
+          <button class="ghost-button" id="focusToggle" type="button">演示视图</button>
+        </div>
+        <div class="step-track" id="presentationSteps"></div>
+      </section>
+
+      <section class="workspace">
+        <aside class="pane">
+          <div class="pane-inner">
+            <div class="section-title">
+              <h2>工作台</h2>
+              <span class="status-pill">AI Flow</span>
+            </div>
+            <div class="prompt-stack" id="promptButtons"></div>
+            <div class="query-box">
+              <label for="queryInput" class="eyebrow">当前指令</label>
+              <textarea id="queryInput"></textarea>
+              <button class="primary-button" id="runButton" type="button">执行</button>
+            </div>
+            <section class="workflow-card">
+              <div class="workflow-head">
+                <h3>AI 工作流</h3>
+                <span>可解释</span>
+              </div>
+              <ol class="workflow-steps" id="workflowSteps"></ol>
+            </section>
+            <details class="debug-drawer">
+              <summary>技术细节</summary>
+              <pre class="parsed-box" id="parsedOutput"></pre>
+            </details>
+          </div>
+        </aside>
+
+        <section class="pane">
+          <div class="pane-inner" id="resultPanel"></div>
+        </section>
+
+        <aside class="pane">
+          <div class="pane-inner">
+            <div class="section-title">
+              <h2>运营看板</h2>
+              <span class="status-pill">BI</span>
+            </div>
+            <div class="metrics-grid" id="metricsGrid"></div>
+            <div class="live-feedback" id="liveFeedback">等待现场操作</div>
+
+            <section class="dashboard-section">
+              <h3>冲突空间 TOP5</h3>
+              <ul class="conflict-list" id="conflictList"></ul>
+            </section>
+
+            <section class="dashboard-section brief-box">
+              <h3>当前视图</h3>
+              <p id="weeklyBrief"></p>
+            </section>
+
+            <section class="dashboard-section">
+              <h3>提示</h3>
+              <ol class="action-list" id="actionList"></ol>
+            </section>
+          </div>
+        </aside>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
