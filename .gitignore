@@ -25,3 +25,7 @@ venv/
 # Internal AI authoring artifacts (implementation plans / design specs) — not for submission
 docs/superpowers/
 
+# Defense / rehearsal prep — presenter-only, not submission deliverables
+deliverables/06_答辩模拟稿.md
+deliverables/v1.0/01_答辩演示手册.md
+
