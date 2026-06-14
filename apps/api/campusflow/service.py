@@ -108,7 +108,7 @@ def submit_application(conn, user_context, input_text):
     application_id = new_id("APP")
     created = now_iso()
     risk = draft["risk"]
-    status = "pending_review" if risk["must_manual_review"] else "pending_review"
+    status = "pending_review"
     conn.execute(
         """
         insert into applications values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
