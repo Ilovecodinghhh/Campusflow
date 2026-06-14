@@ -22,3 +22,6 @@ venv/
 个人备答资料_勿提交/
 提交包/CampusFlow.zip
 
+# Internal AI authoring artifacts (implementation plans / design specs) — not for submission
+docs/superpowers/
+
