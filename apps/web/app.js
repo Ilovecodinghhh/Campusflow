@@ -6,16 +6,15 @@
     管理员: '本周哪些空间冲突最多？给出下周建议。'
   };
   const modes = {
-    '3': [['学生', '一句话找空间'], ['社团负责人', '生成活动申请'], ['老师', '人工审批兜底'], ['管理员', '运营复盘']],
-    '10': [['学生', '痛点切入'], ['社团负责人', '申请预审'], ['老师', '审批工作台'], ['管理员', '调度看板'], ['管理员', '试点验收']]
+    '3': [['学生', '一句话找空间'], ['社团负责人', '生成活动申请'], ['老师', '人工审批兜底'], ['管理员', '运营复盘']]
   };
   const state = { role: '学生', mode: '3', step: 0 };
   const $ = (id) => document.querySelector(id);
   const els = {
     status: $('#serverStatus'), activeRole: $('#activeRole'), tabs: $('#roleTabs'), prompts: $('#promptList'), input: $('#queryInput'),
     run: $('#runButton'), submit: $('#submitButton'), workflow: $('#workflowSteps'), parsed: $('#parsedOutput'), result: $('#resultPanel'),
-    metrics: $('#metricsGrid'), conflicts: $('#conflictList'), brief: $('#weeklyBrief'), audit: $('#auditList'), mode3: $('#mode3'), mode10: $('#mode10'),
-    delivery: $('#deliveryBrief'), readiness: $('#readinessBrief'), acceptance: $('#acceptanceBrief'), next: $('#nextStep'), focus: $('#focusMode'), reset: $('#resetDemo'), pTitle: $('#presentationTitle'), pPoint: $('#presentationPoint'), steps: $('#stepTrack')
+    mode3: $('#mode3'),
+    next: $('#nextStep'), focus: $('#focusMode'), reset: $('#resetDemo'), pTitle: $('#presentationTitle'), pPoint: $('#presentationPoint'), steps: $('#stepTrack')
   };
 
   function esc(value) {
@@ -72,7 +71,6 @@
       runCurrent();
     });
     els.mode3.addEventListener('click', () => setMode('3'));
-    els.mode10.addEventListener('click', () => setMode('10'));
     els.next.addEventListener('click', () => {
       state.step = (state.step + 1) % modes[state.mode].length;
       setRole(modes[state.mode][state.step][0]);
@@ -132,7 +130,6 @@
     const list = modes[state.mode];
     const item = list[state.step] || list[0];
     els.mode3.classList.toggle('is-active', state.mode === '3');
-    els.mode10.classList.toggle('is-active', state.mode === '10');
     els.pTitle.textContent = state.mode + ' 分钟演示 · ' + item[1];
     els.pPoint.textContent = item[0] + '视图：' + prompts[item[0]];
     els.steps.innerHTML = list.map((step, index) =>
@@ -451,40 +448,7 @@
   }
 
   async function refreshSide() {
-    const [summary, pilot, readiness, delivery, audit] = await Promise.all([
-      get('/api/operations/summary?role=' + encodeURIComponent('管理员')),
-      get('/api/pilot/summary?role=' + encodeURIComponent('管理员')),
-      get('/api/pilot/readiness?role=' + encodeURIComponent('管理员')),
-      get('/api/pilot/delivery?role=' + encodeURIComponent('管理员')),
-      get('/api/audit')
-    ]);
-    const cards = [
-      ['交付状态', delivery.delivery_status === 'ready_to_submit' ? '可提交' : '待补齐'],
-      ['准备度', readiness.readiness_score + '分'],
-      ['模拟数据', readiness.privacy.contains_customer_data ? '异常' : '安全'],
-      ['空间利用率', summary.metrics.space_utilization_rate + '%'],
-      ['验收门槛', pilot.acceptance.passed + '/' + pilot.acceptance.total],
-      ['报告章节', delivery.report_export.sections.length]
-    ];
-    els.metrics.innerHTML = cards.map((item) =>
-      '<article><span>' + esc(item[0]) + '</span><strong>' + esc(item[1]) + '</strong></article>'
-    ).join('');
-    els.delivery.textContent = delivery.delivery_status === 'ready_to_submit'
-      ? '交付包可提交：配置中心、模拟导入校验和 Markdown 报告已生成。'
-      : '交付包待补齐：请检查配置、导入校验或报告导出。';
-    els.readiness.textContent = readiness.privacy.contains_customer_data
-      ? '隐私检查异常：请移除真实客户数据后再试点。'
-      : '准备度 ' + readiness.readiness_score + ' 分：独立模拟数据通过隐私边界检查。';
-    els.acceptance.textContent = pilot.acceptance.status === 'go'
-      ? '自动结论：通过 ' + pilot.acceptance.passed + '/' + pilot.acceptance.total + ' 项，建议进入小范围真实试点。'
-      : '自动结论：仍需补齐关键门槛后再进入试点。';
-    els.conflicts.innerHTML = summary.conflicts.map((item) =>
-      '<li><strong>' + esc(item.space_name) + '</strong><span>' + esc(item.count) + ' 次</span></li>'
-    ).join('');
-    els.brief.textContent = summary.weekly_brief;
-    els.audit.innerHTML = audit.items.slice(0, 8).map((item) =>
-      '<li><strong>' + esc(item.action) + '</strong><span>' + esc(item.role) + ' · ' + esc(item.created_at.slice(0, 19).replace('T', ' ')) + '</span></li>'
-    ).join('');
+    // 指标与审计侧边栏已移除；管理员视图在结果区单独拉取所需数据。
   }
 
   function showError(error) {

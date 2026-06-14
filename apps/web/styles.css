@@ -347,7 +347,7 @@ dd {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(280px, 330px) minmax(420px, 1fr) minmax(290px, 360px);
+  grid-template-columns: minmax(280px, 330px) minmax(420px, 1fr);
   gap: 16px;
   flex: 1;
   padding: 18px 24px 32px;
@@ -359,11 +359,10 @@ dd {
   background: var(--panel);
 }
 
-/* side rails read as a distinct, calmer neutral layer.
-   They flow with the page (no independent scroll) so the wheel
-   never gets trapped over a rail — the whole page scrolls as one. */
-.left-pane,
-.right-pane {
+/* the side rail reads as a distinct, calmer neutral layer.
+   It flows with the page (no independent scroll) so the wheel
+   never gets trapped over the rail — the whole page scrolls as one. */
+.left-pane {
   align-self: start;
   background: var(--rail);
 }
@@ -1810,8 +1809,7 @@ dd {
 
 /* ---------- Focus (presentation) mode ---------- */
 
-.is-focus .left-pane,
-.is-focus .right-pane {
+.is-focus .left-pane {
   display: none;
 }
 
@@ -1823,16 +1821,6 @@ dd {
 }
 
 /* ---------- Responsive (structural) ---------- */
-
-@media (max-width: 1180px) {
-  .workspace {
-    grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  }
-
-  .right-pane {
-    grid-column: 1 / -1;
-  }
-}
 
 @media (max-width: 860px) {
   .workspace {

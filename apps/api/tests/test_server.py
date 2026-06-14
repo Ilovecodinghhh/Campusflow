@@ -50,7 +50,6 @@ class ServerIntegrationTest(unittest.TestCase):
         self.assertIn("text/html", html_type)
         self.assertIn("CampusFlow V1.3 试点交付版", html)
         self.assertIn("V1.3 试点交付", html)
-        self.assertIn("试点验收摘要", html)
         self.assertIn("重置演示", html)
         self.assertIn("javascript", js_type)
         self.assertIn("renderRecommendations", js)
